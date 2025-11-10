@@ -2,6 +2,15 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { auth, db } from '@/lib/firebase';
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function LoginPage() {
   const [action, setAction] = useState("Login");
@@ -9,21 +18,69 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [loginEmail, setLoginEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (action === "Login") {
-      console.log('--- Login Attempt ---');
-      console.log('Email:', loginEmail);
-      console.log('Password:', password);
-    } else {
-      console.log('--- Sign Up Attempt ---');
-      console.log('Name:', name);
-      console.log('Username:', username);
-      console.log('Email:', loginEmail);
-      console.log('Password:', password);
+    setError(null);
+    setLoading(true);
+
+    try {
+      if (action === 'Login') {
+        await signInWithEmailAndPassword(auth, loginEmail, password);
+        // Redirect to home (or dashboard)
+        router.push('/home');
+      } else {
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          loginEmail,
+          password
+        );
+        const user = userCredential.user;
+        // Create a user doc in Firestore
+        await setDoc(doc(db, 'users', user.uid), {
+          name,
+          username,
+          email: loginEmail,
+          createdAt: serverTimestamp(),
+        });
+        router.push('/home');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err?.message || 'An unexpected error occurred');
+    } finally {
+      setLoading(false);
     }
-    console.log(`${action} attempt submitted.`);
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setLoading(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      // Ensure user doc exists
+      await setDoc(
+        doc(db, 'users', user.uid),
+        {
+          name: user.displayName || '',
+          username: user.displayName ? user.displayName.replace(/\s+/g, '').toLowerCase() : '',
+          email: user.email || '',
+          createdAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+  router.push('/home');
+    } catch (err: any) {
+      console.error(err);
+      setError(err?.message || 'Google sign-in failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -113,11 +170,28 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full py-[0.9rem] bg-[#4a00e0] text-white rounded-[8px] text-base font-['Galindo'] font-normal cursor-pointer transition-all hover:bg-[#3a00b0] active:scale-[0.98]"
+              disabled={loading}
+              className={`w-full py-[0.9rem] rounded-[8px] text-base font-['Galindo'] font-normal transition-all active:scale-[0.98] ${loading ? 'bg-[#bfb7ff] text-[#eee] cursor-wait' : 'bg-[#4a00e0] text-white cursor-pointer hover:bg-[#3a00b0]'}`}
             >
-              {action === "Login" ? "Login" : "Sign Up"}
+              {loading ? 'Please wait...' : (action === 'Login' ? 'Login' : 'Sign Up')}
             </button>
           </form>
+
+          {error && (
+            <div className="mt-4 text-left w-full">
+              <div className="text-sm text-red-600">{error}</div>
+            </div>
+          )}
+
+          <div className="w-full mt-4">
+            <button
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+              className="w-full py-[0.6rem] border border-[#ddd] rounded-[8px] bg-white text-[#444] hover:bg-[#f7f7f7] transition-all"
+            >
+              Continue with Google
+            </button>
+          </div>
 
           <div className="mt-6">
             <a
