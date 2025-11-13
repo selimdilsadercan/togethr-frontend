@@ -38,7 +38,7 @@ const VoteCard: React.FC<VoteCardProps> = ({ text, onClick, selected, delay = 0 
   return (
     <div
       onClick={onClick}
-      className={`cursor-pointer rounded-lg shadow-lg transition-all duration-200 hover:shadow-2xl w-[300px] h-[468px] ${selected ? 'ring-4 ring-purple-500 scale-105' : ''}`}
+      className={`cursor-pointer rounded-lg shadow-lg transition-all duration-200 hover:shadow-2xl w-[300px] h-[200px] md:w-[300px] md:h-[468px] ${selected ? 'ring-4 ring-purple-500 scale-105' : ''}`}
       style={{
         transformStyle: 'preserve-3d',
         transform: isVisible ? (selected ? 'scale(1.05)' : 'scale(1)') : 'rotateY(180deg) scale(0.95) translateY(10px)',
@@ -58,7 +58,7 @@ const VoteCard: React.FC<VoteCardProps> = ({ text, onClick, selected, delay = 0 
       <div
         className="absolute inset-0 bg-white rounded-lg flex flex-col justify-center items-center"
       >
-        <p className="text-center font-['Galindo'] text-2xl text-gray-800">{text}</p>
+        <p className="text-center font-['Galindo'] text-lg md:text-2xl text-gray-800">{text}</p>
       </div>
     </div>
   );
