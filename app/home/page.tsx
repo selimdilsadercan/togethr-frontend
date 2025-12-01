@@ -4,37 +4,60 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth, db } from "@/lib/firebase";
 import { onAuthStateChanged, signOut, User } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { Bell, Home, Compass, User as UserIcon, Plus } from "lucide-react";
+import Link from "next/link";
+
+interface Game {
+  id: string;
+  name: string;
+  activeCount: number;
+  totalCount: number;
+  playedCount: number;
+  playedRecently: number;
+}
 
 export default function HomePage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [userDoc, setUserDoc] = useState<any>(null);
+  const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
-      if (!u) {
-        // Not logged in -> send to login
-        router.push('/login');
-        return;
-      }
+      if (u) {
+        setUser(u);
 
-      setUser(u);
+        try {
+          const ref = doc(db, 'users', u.uid);
+          const snap = await getDoc(ref);
+          if (snap.exists()) {
+            setUserDoc(snap.data());
+          } else {
+            // No user doc — still show basic auth info
+            setUserDoc(null);
+          }
 
-      try {
-        const ref = doc(db, 'users', u.uid);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          setUserDoc(snap.data());
-        } else {
-          // No user doc — still show basic auth info
+          // Fetch games
+          const gamesRef = collection(db, 'games');
+          const gamesSnap = await getDocs(gamesRef);
+          const gamesList: Game[] = gamesSnap.docs.map((doc) => ({
+            id: doc.id,
+            name: doc.data().name || 'Untitled Game',
+            activeCount: doc.data().activeCount || 0,
+            totalCount: doc.data().totalCount || 0,
+            playedCount: doc.data().playedCount || 0,
+            playedRecently: doc.data().playedRecently || 0,
+          }));
+          setGames(gamesList);
+        } catch (e) {
+          console.error('failed to load data', e);
           setUserDoc(null);
+        } finally {
+          setLoading(false);
         }
-      } catch (e) {
-        console.error('failed to load user doc', e);
-        setUserDoc(null);
-      } finally {
+      } else {
         setLoading(false);
       }
     });
@@ -57,39 +80,97 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-start justify-center py-20">
-      <div className="bg-white rounded-lg shadow-md p-8 w-[480px]">
-        <h1 className="text-2xl font-bold mb-4">Welcome{userDoc?.name ? `, ${userDoc.name}` : user?.displayName ? `, ${user.displayName}` : ''}!</h1>
+    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-blue-50 flex flex-col pb-24">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-4 py-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-blue-600">home</h1>
+        <Bell size={24} className="text-gray-600" />
+      </div>
 
-        <div className="mb-4">
-          <div className="text-sm text-gray-500">Email</div>
-          <div className="text-base">{user?.email}</div>
+      {/* Main Content */}
+      <div className="flex-1 px-4 py-6 max-w-2xl mx-auto w-full">
+        {/* Welcome Section */}
+        <div className="mb-8">
+          <h2 className="text-4xl font-bold text-blue-600 mb-2">👋 Merhaba Selim</h2>
+          <p className="text-xl text-blue-600 font-semibold">Bugün ne yapıyoruz?</p>
         </div>
 
-        <div className="mb-4">
-          <div className="text-sm text-gray-500">Username</div>
-          <div className="text-base">{userDoc?.username || '—'}</div>
+        {/* Active Games */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-blue-600 mb-4">Oylamayı Tamamla</h3>
+          <div className="bg-white rounded-3xl border-4 border-blue-500 p-6">
+            <div className="flex items-center gap-3">
+              <span className="text-4xl">👥</span>
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold text-gray-800">12 / 16</span>
+                <span className="text-sm text-gray-600">Evde Oynanacak Oyunlar</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="mb-4">
-          <div className="text-sm text-gray-500">Joined</div>
-          <div className="text-base">{userDoc?.createdAt ? new Date(userDoc.createdAt.seconds * 1000).toLocaleString() : '—'}</div>
+        {/* Recent Games */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-blue-600 mb-4">Son Oylamalarım</h3>
+          <div className="grid grid-cols-2 gap-4">
+            {/* Game 1 */}
+            <div className="bg-white rounded-3xl border-4 border-blue-500 p-6">
+              <div className="text-3xl font-bold text-gray-800 mb-3">101</div>
+              <p className="text-sm font-semibold text-gray-700 mb-3">oynana cak mekanlar</p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-600 font-bold">≡</span>
+                  <span className="text-sm text-gray-700">20 mekan</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-red-500 text-lg">🔥</span>
+                  <span className="text-sm text-gray-700">124 kere oylandı</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Game 2 */}
+            <div className="bg-white rounded-3xl border-4 border-blue-500 p-6">
+              <p className="text-lg font-semibold text-gray-700 mb-3">Evde</p>
+              <p className="text-lg font-semibold text-gray-700 mb-3">Oynanacak</p>
+              <p className="text-lg font-semibold text-gray-700 mb-3">Oyunlar</p>
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-blue-600 font-bold">≡</span>
+                  <span className="text-sm text-gray-700">12 oyun</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-red-500 text-lg">🔥</span>
+                  <span className="text-sm text-gray-700">32 kere oylandı</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div className="flex gap-3 mt-6">
-          <button
-            onClick={handleSignOut}
-            className="px-4 py-2 rounded bg-red-600 text-white"
-          >
-            Sign out
+        {/* Add Button */}
+        <div className="fixed bottom-24 right-4 md:right-8">
+          <button className="bg-white border-4 border-blue-500 rounded-2xl w-16 h-16 flex items-center justify-center hover:bg-blue-50 transition">
+            <Plus size={32} className="text-blue-600" />
           </button>
+        </div>
+      </div>
 
-          <button
-            onClick={() => router.push('/')}
-            className="px-4 py-2 rounded border border-gray-200"
-          >
-            Home (public)
-          </button>
+      {/* Bottom Navigation */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 rounded-t-3xl">
+        <div className="flex justify-around items-center py-4 max-w-2xl mx-auto w-full px-4">
+          <Link href="/home" className="flex flex-col items-center gap-1 cursor-pointer">
+            <Home size={28} className="text-blue-600" />
+            <span className="text-sm text-blue-600 font-semibold">home</span>
+          </Link>
+          <Link href="/explore" className="flex flex-col items-center gap-1 cursor-pointer">
+            <Compass size={28} className="text-gray-400" />
+            <span className="text-sm text-gray-400">explore</span>
+          </Link>
+          <Link href="/profile" className="flex flex-col items-center gap-1 cursor-pointer">
+            <UserIcon size={28} className="text-gray-400" />
+            <span className="text-sm text-gray-400">profile</span>
+          </Link>
         </div>
       </div>
     </div>
