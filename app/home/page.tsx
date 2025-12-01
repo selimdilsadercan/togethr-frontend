@@ -213,7 +213,10 @@ export default function HomePage() {
           </section>
         </div>
 
-        <button className="fixed bottom-24 right-5 bg-[#4a00c9] text-white rounded-2xl w-16 h-16 flex items-center justify-center shadow-xl border-4 border-white hover:scale-105 transition">
+        <button 
+          onClick={() => router.push("/create")}
+          className="fixed bottom-24 right-5 bg-[#4a00c9] text-white rounded-2xl w-16 h-16 flex items-center justify-center shadow-xl border-4 border-white hover:scale-105 transition"
+        >
           <Plus size={28} />
         </button>
 
