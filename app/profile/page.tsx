@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Home, Search, User } from 'lucide-react';
+import BottomNav from '@/components/AppBar';
 
 export default function ProfilePage() {
   const [activeTab, setActiveTab] = useState('tumu');
@@ -55,9 +56,9 @@ export default function ProfilePage() {
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       <link href="https://fonts.googleapis.com/css2?family=Galindo&display=swap" rel="stylesheet" />
 
-      <div className="min-h-screen bg-gradient-to-b from-[#5e00c9] to-[#5e00c9] pb-20 font-['Galindo']">
+      <div className="min-h-screen bg-white pb-20 font-['Galindo']">
         
-        <div className="bg-white/10 backdrop-blur-sm px-4 py-4 flex justify-between items-center border-b border-white/20">
+        <div className="bg-[#5e00c9] backdrop-blur-sm px-4 py-4 flex justify-between items-center border-b border-white/20">
           <div className="flex-1"></div>
           <input
             type="text"
@@ -68,7 +69,7 @@ export default function ProfilePage() {
         </div>
 
         
-        <div className="bg-white/10 backdrop-blur-sm px-4 py-8 text-center border-b border-white/20">
+        <div className="bg-gradient-to-b from-[#5e00c9] to-[#5e00c9] backdrop-blur-sm px-4 py-8 text-center border-b border-white/20">
           <div className="flex justify-center mb-6">
             <Avatar className="w-24 h-24 border-4 border-white shadow-lg">
               <AvatarImage src={user.avatar} alt={user.name} />
@@ -105,7 +106,7 @@ export default function ProfilePage() {
         </div>
 
         
-        <div className="bg-white/10 backdrop-blur-sm px-4 py-4 flex gap-3 border-b border-white/20 overflow-x-auto">
+        <div className="bg-[#5e00c9] backdrop-blur-sm px-4 py-4 flex gap-3 border-b border-white/20 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab}
@@ -126,7 +127,7 @@ export default function ProfilePage() {
           <div className="grid grid-cols-2 gap-4">
             {favorites.map((item) => (
               <Link href={`/favorites/${item.id}`} key={item.id}>
-                <div className="bg-white rounded-2xl p-5 hover:shadow-xl transition cursor-pointer border-2 border-white/30 hover:border-white/50">
+                <div className="bg-gray-100 rounded-2xl p-5 hover:shadow-xl transition cursor-pointer border-2 border-white/30 hover:border-white/50">
                   <h3 className="font-['Galindo'] font-normal text-gray-800 text-sm mb-4 line-clamp-2">
                     {item.title}
                   </h3>
@@ -150,16 +151,16 @@ export default function ProfilePage() {
         <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-white/30">
           <div className="flex justify-around items-center py-4">
             <Link href="/" className="flex flex-col items-center gap-2 group">
-              <Home size={24} className="text-[#4a00e0] group-hover:scale-110 transition" />
-              <span className="text-xs text-[#4a00e0] font-['Galindo'] font-normal">home</span>
+              <Home size={24} className="text-[#4a00c9] group-hover:scale-110 transition" />
+              <span className="text-xs text-[#4a00c9] font-['Galindo'] font-normal">home</span>
             </Link>
             <Link href="/explore" className="flex flex-col items-center gap-2 group">
-              <Search size={24} className="text-[#4a00e0] group-hover:scale-110 transition" />
-              <span className="text-xs text-[#4a00e0] font-['Galindo'] font-normal">explore</span>
+              <Search size={24} className="text-[#4a00c9] group-hover:scale-110 transition" />
+              <span className="text-xs text-[#4a00c9] font-['Galindo'] font-normal">explore</span>
             </Link>
             <Link href="/profile" className="flex flex-col items-center gap-2 group">
-              <User size={24} className="text-[#4a00e0] group-hover:scale-110 transition" />
-              <span className="text-xs text-[#4a00e0] font-['Galindo'] font-normal">profile</span>
+              <User size={24} className="text-[#4a00c9] group-hover:scale-110 transition" />
+              <span className="text-xs text-[#4a00c9] font-['Galindo'] font-normal">profile</span>
             </Link>
           </div>
         </div>
