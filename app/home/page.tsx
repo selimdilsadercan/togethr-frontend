@@ -120,8 +120,7 @@ export default function HomePage() {
       <div className="min-h-screen bg-white pb-24 font-['Galindo']">
         <div className="bg-[#5e00c9] px-4 py-4 flex items-center gap-3 border-b border-white/20">
           <div className="flex-1">
-            <p className="text-xs text-white/70">Hoş geldin</p>
-            <h1 className="text-3xl text-white font-normal">{displayName}</h1>
+            <h1 className="text-3xl text-white font-normal">Welcome {displayName}</h1>
             {email && <p className="text-xs text-white/70 mt-1">{email}</p>}
           </div>
           <button
@@ -129,9 +128,6 @@ export default function HomePage() {
             className="rounded-full border border-white/30 p-2 text-white hover:bg-white/10 transition"
           >
             <LogOut size={18} />
-          </button>
-          <button className="rounded-full border border-white/30 p-2 text-white hover:bg-white/10 transition">
-            <Sparkles size={18} />
           </button>
         </div>
 
