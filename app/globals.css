@@ -113,11 +113,15 @@
 }
 
 @layer base {
+  html {
+    background-color: #5e00c9;
+  }
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
+    background-color: #5e00c9;
   }
 }
 
