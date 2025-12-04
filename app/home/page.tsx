@@ -41,7 +41,6 @@ export default function HomePage() {
   const [user, setUser] = useState<User | null>(null);
   const [userDoc, setUserDoc] = useState<any>(null);
   const [games, setGames] = useState<Game[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (u) => {
@@ -67,11 +66,7 @@ export default function HomePage() {
         } catch (e) {
           console.error("failed to load data", e);
           setUserDoc(null);
-        } finally {
-          setLoading(false);
         }
-      } else {
-        setLoading(false);
       }
     });
 
@@ -83,7 +78,8 @@ export default function HomePage() {
     router.push("/login");
   };
 
-  const displayName = userDoc?.name || user?.displayName || "Misafir";
+  const fullName = userDoc?.name || user?.displayName || "Misafir";
+  const displayName = fullName.split(' ')[0]; // Sadece ilk adı al
   const email = userDoc?.email || user?.email;
   const hasGames = games.length > 0;
   const gameCards = hasGames ? games : fallbackGames;
@@ -97,20 +93,6 @@ export default function HomePage() {
     [games]
   );
 
-  if (loading) {
-    return (
-      <>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        <link href="https://fonts.googleapis.com/css2?family=Galindo&display=swap" rel="stylesheet" />
-
-        <div className="min-h-screen flex items-center justify-center bg-white font-['Galindo']">
-          <div className="text-[#4a00c9]">Yükleniyor...</div>
-        </div>
-      </>
-    );
-  }
-
   return (
     <>
       <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -120,7 +102,7 @@ export default function HomePage() {
       <div className="min-h-screen bg-white pb-24 font-['Galindo']">
         <div className="bg-[#5e00c9] px-4 py-4 flex items-center gap-3 border-b border-white/20">
           <div className="flex-1">
-            <h1 className="text-3xl text-white font-normal">Welcome {displayName}</h1>
+            <h1 className="text-3xl text-white font-normal">Merhaba {displayName}</h1>
             {email && <p className="text-xs text-white/70 mt-1">{email}</p>}
           </div>
           <button
