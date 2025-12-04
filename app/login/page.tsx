@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { auth, db } from '@/lib/firebase';
@@ -8,7 +8,8 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
-  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
 } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 
@@ -21,6 +22,38 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+
+  // Handle Google redirect result on component mount
+  useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const result = await getRedirectResult(auth);
+        if (result) {
+          const user = result.user;
+          // Ensure user doc exists
+          await setDoc(
+            doc(db, 'users', user.uid),
+            {
+              name: user.displayName || '',
+              username: user.displayName ? user.displayName.replace(/\s+/g, '').toLowerCase() : '',
+              email: user.email || '',
+              createdAt: serverTimestamp(),
+            },
+            { merge: true }
+          );
+          router.push('/home');
+        }
+      } catch (err: any) {
+        console.error('Google sign-in error:', err);
+        // Only show error if it's not a COOP-related error
+        if (!err.message?.includes('Cross-Origin-Opener-Policy')) {
+          setError(err?.message || 'Google sign-in failed');
+        }
+      }
+    };
+
+    handleRedirectResult();
+  }, [router]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -61,24 +94,12 @@ export default function LoginPage() {
     setLoading(true);
     const provider = new GoogleAuthProvider();
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      // Ensure user doc exists
-      await setDoc(
-        doc(db, 'users', user.uid),
-        {
-          name: user.displayName || '',
-          username: user.displayName ? user.displayName.replace(/\s+/g, '').toLowerCase() : '',
-          email: user.email || '',
-          createdAt: serverTimestamp(),
-        },
-        { merge: true }
-      );
-  router.push('/home');
+      // Use redirect instead of popup to avoid COOP issues
+      await signInWithRedirect(auth, provider);
+      // The redirect will happen, and the result will be handled in useEffect
     } catch (err: any) {
       console.error(err);
       setError(err?.message || 'Google sign-in failed');
-    } finally {
       setLoading(false);
     }
   };
