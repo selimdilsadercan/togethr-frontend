@@ -117,7 +117,7 @@ export default function ExplorePage() {
         <div className="px-4 -mt-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {filteredCards.map((card) => (
-              <Link href={`/vote?list=${card.id}`} key={card.id}>
+              <Link href={`/list?listId=${card.id}`} key={card.id}>
                 <div className="bg-gray-100 rounded-2xl p-5 border-2 border-white/40 hover:border-white/70 hover:shadow-md transition cursor-pointer">
                   <h3 className="text-sm text-gray-800 mb-4 line-clamp-2">
                     {card.title}
