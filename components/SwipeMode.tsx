@@ -358,10 +358,29 @@ export default function SwipeMode({ items, onComplete, onBack }: SwipeModProps) 
 
         {/* Card Stack */}
         <div className="relative h-[500px] max-w-md mx-auto mb-8">
-          {/* Next card (preview) */}
+          {/* Next card (preview, with details) */}
           {currentIndex + 1 < items.length && (
-            <div className="absolute inset-0 top-4">
-              <div className="bg-white/50 rounded-3xl h-full transform scale-95 backdrop-blur-sm" />
+            <div className="absolute inset-0 top-4 pointer-events-none">
+              <div className="bg-white/60 rounded-3xl h-full transform scale-95 backdrop-blur-md shadow-xl flex flex-col justify-center items-center p-8 opacity-80">
+                <div className="text-center">
+                  <div className="size-20 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <span className="text-4xl">🎮</span>
+                  </div>
+                  <h2 className="text-xl font-normal text-gray-700 mb-2">
+                    {items[currentIndex + 1].title}
+                  </h2>
+                  {items[currentIndex + 1].playerCount && (
+                    <p className="text-sm text-gray-500 mb-1">
+                      👥 {items[currentIndex + 1].playerCount}
+                    </p>
+                  )}
+                  {items[currentIndex + 1].gameType && (
+                    <p className="text-sm text-gray-500">
+                      🎯 {items[currentIndex + 1].gameType}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
