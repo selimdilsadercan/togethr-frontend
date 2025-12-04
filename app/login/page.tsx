@@ -89,21 +89,21 @@ export default function LoginPage() {
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       <link href="https://fonts.googleapis.com/css2?family=Galindo&display=swap" rel="stylesheet" />
 
-      <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-br from-[#5e00c9] to-[#5e00c9] pt-[60px]">
-        <div className="font-['Galindo'] text-[5.5rem] text-white mb-10 text-center drop-shadow-[2px_2px_5px_rgba(0,0,0,0.3)]">
+      <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-[#5e00c9] to-[#5e00c9] overflow-hidden px-4">
+        <div className="font-['Galindo'] text-[3rem] sm:text-[4rem] text-white mb-4 sm:mb-6 text-center drop-shadow-[2px_2px_5px_rgba(0,0,0,0.3)] flex-shrink-0">
           Welcome to Togethr
         </div>
 
-        <div className="flex flex-col items-center justify-center bg-white rounded-[20px] p-[40px_50px] shadow-[0_8px_16px_rgba(0,0,0,0.2)] w-[400px] min-h-[450px] text-center">
-          <h2 className="font-['Galindo'] text-[2.5rem] mt-0 mb-8 text-[#333]">
+        <div className="flex flex-col items-center justify-center bg-white rounded-[20px] p-[24px_28px] sm:p-[32px_40px] shadow-[0_8px_16px_rgba(0,0,0,0.2)] w-full max-w-[400px] text-center flex-shrink-0 overflow-y-auto max-h-[85vh]">
+          <h2 className="font-['Galindo'] text-[2rem] mt-0 mb-6 text-[#333]">
             {action}
           </h2>
 
           <form onSubmit={handleSubmit} className="w-full">
             {action === "Sign Up" && (
               <>
-                <div className="mb-6 text-left">
-                  <label htmlFor="name" className="block mb-2 text-[#555] font-['Galindo'] font-normal">
+                <div className="mb-4 text-left">
+                  <label htmlFor="name" className="block mb-2 text-[#555] font-['Galindo'] font-normal text-sm">
                     Name:
                   </label>
                   <input
@@ -114,12 +114,12 @@ export default function LoginPage() {
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Enter your full name"
                     required
-                    className="w-full p-[0.8rem] border border-[#ddd] rounded-[8px] text-base font-['Galindo'] placeholder:text-[#666666] placeholder:opacity-50"
+                    className="w-full p-[0.6rem] border border-[#ddd] rounded-[8px] text-sm font-['Galindo'] placeholder:text-[#666666] placeholder:opacity-50"
                   />
                 </div>
 
-                <div className="mb-6 text-left">
-                  <label htmlFor="username" className="block mb-2 text-[#555] font-['Galindo'] font-normal">
+                <div className="mb-4 text-left">
+                  <label htmlFor="username" className="block mb-2 text-[#555] font-['Galindo'] font-normal text-sm">
                     Username:
                   </label>
                   <input
@@ -130,14 +130,14 @@ export default function LoginPage() {
                     onChange={(e) => setUsername(e.target.value)}
                     placeholder="Enter your username"
                     required
-                    className="w-full p-[0.8rem] border border-[#ddd] rounded-[8px] text-base font-['Galindo'] placeholder:text-[#666666] placeholder:opacity-50"
+                    className="w-full p-[0.6rem] border border-[#ddd] rounded-[8px] text-sm font-['Galindo'] placeholder:text-[#666666] placeholder:opacity-50"
                   />
                 </div>
               </>
             )}
 
-            <div className="mb-6 text-left">
-              <label htmlFor="loginEmail" className="block mb-2 text-[#555] font-['Galindo'] font-normal">
+            <div className="mb-4 text-left">
+              <label htmlFor="loginEmail" className="block mb-2 text-[#555] font-['Galindo'] font-normal text-sm">
                 Email:
               </label>
               <input
@@ -148,12 +148,12 @@ export default function LoginPage() {
                 onChange={(e) => setLoginEmail(e.target.value)}
                 placeholder="Enter your email address"
                 required
-                className="w-full p-[0.8rem] border border-[#ddd] rounded-[8px] text-base font-['Galindo'] placeholder:text-[#666666] placeholder:opacity-50"
+                className="w-full p-[0.6rem] border border-[#ddd] rounded-[8px] text-sm font-['Galindo'] placeholder:text-[#666666] placeholder:opacity-50"
               />
             </div>
 
-            <div className="mb-6 text-left">
-              <label htmlFor="password" className="block mb-2 text-[#555] font-['Galindo'] font-normal">
+            <div className="mb-5 text-left">
+              <label htmlFor="password" className="block mb-2 text-[#555] font-['Galindo'] font-normal text-sm">
                 Password:
               </label>
               <input
@@ -164,40 +164,40 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
                 required
-                className="w-full p-[0.8rem] border border-[#ddd] rounded-[8px] text-base font-['Galindo'] placeholder:text-[#666666] placeholder:opacity-50"
+                className="w-full p-[0.6rem] border border-[#ddd] rounded-[8px] text-sm font-['Galindo'] placeholder:text-[#666666] placeholder:opacity-50"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className={`w-full py-[0.9rem] rounded-[8px] text-base font-['Galindo'] font-normal transition-all active:scale-[0.98] ${loading ? 'bg-[#bfb7ff] text-[#eee] cursor-wait' : 'bg-[#4a00e0] text-white cursor-pointer hover:bg-[#3a00b0]'}`}
+              className={`w-full py-[0.75rem] rounded-[8px] text-sm font-['Galindo'] font-normal transition-all active:scale-[0.98] ${loading ? 'bg-[#bfb7ff] text-[#eee] cursor-wait' : 'bg-[#4a00e0] text-white cursor-pointer hover:bg-[#3a00b0]'}`}
             >
               {loading ? 'Please wait...' : (action === 'Login' ? 'Login' : 'Sign Up')}
             </button>
           </form>
 
           {error && (
-            <div className="mt-4 text-left w-full">
-              <div className="text-sm text-red-600">{error}</div>
+            <div className="mt-3 text-left w-full">
+              <div className="text-xs text-red-600">{error}</div>
             </div>
           )}
 
-          <div className="w-full mt-4">
+          <div className="w-full mt-3">
             <button
               onClick={handleGoogleSignIn}
               disabled={loading}
-              className="w-full py-[0.6rem] border border-[#ddd] rounded-[8px] bg-white text-[#444] hover:bg-[#f7f7f7] transition-all"
+              className="w-full py-[0.6rem] border border-[#ddd] rounded-[8px] bg-white text-[#444] text-sm hover:bg-[#f7f7f7] transition-all"
             >
               Continue with Google
             </button>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-4">
             <a
               href="#"
               onClick={() => setAction(action === "Login" ? "Sign Up" : "Login")}
-              className="text-[#4a00e0] no-underline block mt-3 text-[0.9rem] font-['Galindo'] hover:underline"
+              className="text-[#4a00e0] no-underline block mt-2 text-[0.85rem] font-['Galindo'] hover:underline"
             >
               {action === "Login"
                 ? "Don't you have an account? Sign Up"
