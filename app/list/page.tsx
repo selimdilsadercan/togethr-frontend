@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ArrowLeft, MoreVertical, Users, Tag, Gamepad2, Star, Sparkles, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, MoreVertical, Users, Tag, Gamepad2, Star, Sparkles, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 import {
   Drawer,
   DrawerClose,
@@ -29,7 +29,7 @@ function ListDetailContent() {
   const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
-  const [voteType, setVoteType] = useState<"vote" | "bracket">("vote");
+  const [voteType, setVoteType] = useState<"swipe" | "bracket">("swipe");
 
   useEffect(() => {
     // Get list from localStorage
@@ -191,19 +191,20 @@ function ListDetailContent() {
                     <h3 className="text-sm font-normal text-gray-700">Oylama Tipi</h3>
                     <div className="grid grid-cols-2 gap-3">
                       <button
-                        onClick={() => setVoteType("vote")}
+                        onClick={() => setVoteType("swipe")}
                         className={`p-4 rounded-2xl border-2 transition ${
-                          voteType === "vote"
+                          voteType === "swipe"
                             ? "border-[#4a00c9] bg-purple-50"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                       >
                         <div className="text-center">
-                          <CheckCircle2 className={`size-8 mx-auto mb-2 ${
-                            voteType === "vote" ? "text-[#4a00c9]" : "text-gray-400"
-                          }`} />
-                          <p className="font-normal text-sm text-gray-800">Vote</p>
-                          <p className="text-xs text-gray-500 mt-1">Klasik oylama</p>
+                          <div className="flex items-center justify-center mx-auto mb-2 gap-2">
+                            <ChevronLeft className={`size-6 ${voteType === "swipe" ? "text-[#4a00c9]" : "text-gray-400"}`} />
+                            <ChevronRight className={`size-6 ${voteType === "swipe" ? "text-[#4a00c9]" : "text-gray-400"}`} />
+                          </div>
+                          <p className="font-normal text-sm text-gray-800">Swipe</p>
+                          <p className="text-xs text-gray-500 mt-1">Sağa/sola kaydırma</p>
                         </div>
                       </button>
                       <button

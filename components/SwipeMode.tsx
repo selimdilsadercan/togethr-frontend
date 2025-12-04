@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { motion, useMotionValue, useTransform, PanInfo } from "framer-motion";
+import { motion, useMotionValue, useTransform, animate, PanInfo } from "framer-motion";
 import { ThumbsUp, ThumbsDown, X, RotateCcw } from "lucide-react";
 
 interface SwipeItem {
@@ -30,6 +30,10 @@ export default function SwipeMode({ items, onComplete, onBack }: SwipeModProps) 
   const currentItem = items[currentIndex];
   const isFinished = currentIndex >= items.length;
 
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-200, 200], [-18, 18]);
+  const opacity = useTransform(x, [-250, 0, 250], [0.6, 1, 0.6]);
+
   const handleVote = (vote: "like" | "dislike") => {
     if (isFinished) return;
 
@@ -40,7 +44,12 @@ export default function SwipeMode({ items, onComplete, onBack }: SwipeModProps) 
 
     const newResults = [...results, newResult];
     setResults(newResults);
-    setDirection(vote === "like" ? "right" : "left");
+    const dir = vote === "like" ? "right" : "left";
+    setDirection(dir);
+
+    // animate card off-screen
+    const target = dir === "right" ? 600 : -600;
+    animate(x, target, { duration: 0.25 });
 
     setTimeout(() => {
       if (currentIndex + 1 >= items.length) {
@@ -48,6 +57,7 @@ export default function SwipeMode({ items, onComplete, onBack }: SwipeModProps) 
       } else {
         setCurrentIndex(currentIndex + 1);
         setDirection(null);
+        x.set(0);
       }
     }, 300);
   };
@@ -57,6 +67,7 @@ export default function SwipeMode({ items, onComplete, onBack }: SwipeModProps) 
       setCurrentIndex(currentIndex - 1);
       setResults(results.slice(0, -1));
       setDirection(null);
+      x.set(0);
     }
   };
 
@@ -119,12 +130,24 @@ export default function SwipeMode({ items, onComplete, onBack }: SwipeModProps) 
             key={currentItem.id}
             className="absolute inset-0 bg-white rounded-3xl shadow-2xl p-8 flex flex-col justify-center items-center"
             initial={{ scale: 1, rotate: 0 }}
-            animate={{
-              x: direction === "left" ? -500 : direction === "right" ? 500 : 0,
-              rotate: direction === "left" ? -20 : direction === "right" ? 20 : 0,
-              opacity: direction ? 0 : 1,
+            style={{ x, rotate, opacity }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.2}
+            onDragEnd={(_, info: PanInfo) => {
+              const offsetX = info.offset.x;
+              const velocityX = info.velocity.x;
+              const thresh = 120;
+
+              if (offsetX > thresh || velocityX > 500) {
+                handleVote("like");
+              } else if (offsetX < -thresh || velocityX < -500) {
+                handleVote("dislike");
+              } else {
+                // snap back
+                animate(x, 0, { duration: 0.2 });
+              }
             }}
-            transition={{ duration: 0.3 }}
           >
             {/* Vote indicator overlay */}
             {direction && (
