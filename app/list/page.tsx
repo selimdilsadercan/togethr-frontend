@@ -225,40 +225,6 @@ function ListDetailContent() {
                       </button>
                     </div>
                   </div>
-
-                  {/* Friend Selection */}
-                  <div className="space-y-3">
-                    <h3 className="text-sm font-normal text-gray-700">Katılımcılar</h3>
-                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {friends.map((friend) => (
-                        <button
-                          key={friend.id}
-                          onClick={() => toggleFriend(friend.id)}
-                          className={`w-full p-3 rounded-xl border-2 transition flex items-center gap-3 ${
-                            selectedFriends.includes(friend.id)
-                              ? "border-[#4a00c9] bg-purple-50"
-                              : "border-gray-200 hover:border-gray-300"
-                          }`}
-                        >
-                          <img 
-                            src={friend.avatar} 
-                            alt={friend.name}
-                            className="size-10 rounded-full"
-                          />
-                          <div className="flex-1 text-left">
-                            <p className="text-sm font-normal text-gray-800">{friend.name}</p>
-                            <p className="text-xs text-gray-500">{friend.username}</p>
-                          </div>
-                          {selectedFriends.includes(friend.id) && (
-                            <CheckCircle2 className="size-5 text-[#4a00c9]" />
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                    <p className="text-xs text-gray-500">
-                      {selectedFriends.length} arkadaş seçildi
-                    </p>
-                  </div>
                 </div>
 
                 <DrawerFooter>

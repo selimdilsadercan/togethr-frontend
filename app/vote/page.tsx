@@ -31,18 +31,11 @@ function VotePageContent() {
     setLoading(false);
   }, [listId, getListById]);
 
-  const handleSwipeComplete = (results: { itemId: string; vote: "like" | "dislike" }[]) => {
+  const handleSwipeComplete = (results: { itemId: string; vote: "like" | "dislike"; playerId: string }[]) => {
     console.log("Swipe results:", results);
     console.log("Participants:", participants);
     
-    // Show results summary
-    const likes = results.filter(r => r.vote === "like").map(r => 
-      items.find(item => item.id === r.itemId)?.title
-    );
-    
-    alert(`Beğendikleriniz:\n${likes.join("\n")}`);
-    
-    // Navigate back or to results page
+    // Navigate back to explore page
     router.push("/explore");
   };
 
