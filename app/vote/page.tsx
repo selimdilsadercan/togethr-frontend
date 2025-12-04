@@ -45,7 +45,7 @@ export default function VotePage() {
   const searchParams = useSearchParams();
   
   const listId = searchParams.get("list");
-  const voteType = searchParams.get("type") || "vote";
+  const voteType = searchParams.get("type") || "swipe";
   const participants = searchParams.get("participants")?.split(",") || [];
 
   const [items, setItems] = useState<VoteItem[]>([]);
