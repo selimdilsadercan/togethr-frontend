@@ -67,9 +67,6 @@ export default function ExplorePage() {
               className="w-full rounded-xl bg-white/20 border border-white/30 text-white placeholder-white/60 pl-10 pr-4 py-3 outline-none"
             />
           </div>
-          <button className="rounded-full border border-white/30 p-2 text-white hover:bg-white/10 transition">
-            <Sparkles size={18} />
-          </button>
         </div>
 
         <div className="bg-gradient-to-b from-[#5e00c9] to-[#7a1aff] px-4 py-8 text-white">
