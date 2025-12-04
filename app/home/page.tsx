@@ -136,7 +136,7 @@ export default function HomePage() {
         </div>
 
         <div className="bg-gradient-to-b from-[#5e00c9] to-[#7a1aff] px-4 py-8 text-white">
-          <p className="text-sm text-white/80">Bugün ne oyluyoruz?</p>
+          <p className="text-sm text-white/80">Bugün ne yapalım?</p>
           <div className="mt-6 grid grid-cols-3 gap-3">
             <div className="bg-white/15 border border-white/20 rounded-2xl p-3 text-center">
               <div className="text-2xl">{totals.lists}</div>
