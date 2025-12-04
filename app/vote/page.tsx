@@ -1,46 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import SwipeMode from "@/components/SwipeMode";
 import BracketMode from "@/components/BracketMode";
+import { useLists } from "@/lib/storage";
 
-interface VoteItem {
-  id: string;
-  title: string;
-  playerCount?: string;
-  gameType?: string;
-}
-
-// Mock data - same as list page
-const mockLists: Record<string, VoteItem[]> = {
-  "1": [
-    { id: "1", title: "Bopl Battle", playerCount: "2-4 kişi", gameType: "Arena / Party Game" },
-    { id: "2", title: "Stick Fight: The Game", playerCount: "2-4 kişi", gameType: "Arena / Party Game" },
-    { id: "3", title: "Ultimate Chicken Horse", playerCount: "2-4 kişi", gameType: "Arena / Party Game" },
-    { id: "4", title: "Tricky Towers", playerCount: "2-4 kişi", gameType: "Arena / Party Game" },
-  ],
-  "2": [
-    { id: "1", title: "Among Us", playerCount: "4-10 kişi", gameType: "Social Deduction" },
-    { id: "2", title: "Gang Beasts", playerCount: "2-4 kişi", gameType: "Party Game" },
-    { id: "3", title: "Overcooked 2", playerCount: "1-4 kişi", gameType: "Co-op" },
-    { id: "4", title: "Mario Kart 8", playerCount: "1-4 kişi", gameType: "Racing" },
-  ],
-  "3": [
-    { id: "1", title: "Piknik yapmak", playerCount: "2+ kişi", gameType: "Outdoor" },
-    { id: "2", title: "Sinema", playerCount: "1+ kişi", gameType: "Entertainment" },
-    { id: "3", title: "Kafe gezme", playerCount: "2+ kişi", gameType: "Social" },
-    { id: "4", title: "Müze ziyareti", playerCount: "1+ kişi", gameType: "Culture" },
-  ],
-  "4": [
-    { id: "1", title: "The Conjuring", playerCount: "N/A", gameType: "Horror / Supernatural" },
-    { id: "2", title: "Hereditary", playerCount: "N/A", gameType: "Horror / Drama" },
-    { id: "3", title: "A Quiet Place", playerCount: "N/A", gameType: "Horror / Thriller" },
-    { id: "4", title: "Get Out", playerCount: "N/A", gameType: "Horror / Thriller" },
-  ],
-};
-
-export default function VotePage() {
+function VotePageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -48,18 +14,22 @@ export default function VotePage() {
   const voteType = searchParams.get("type") || "vote";
   const participants = searchParams.get("participants")?.split(",") || [];
 
-  const [items, setItems] = useState<VoteItem[]>([]);
+  // Use localStorage hook
+  const { getListById } = useLists();
+  
+  const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      if (listId && mockLists[listId]) {
-        setItems(mockLists[listId]);
+    // Get list from localStorage
+    if (listId) {
+      const list = getListById(listId);
+      if (list) {
+        setItems(list.options);
       }
-      setLoading(false);
-    }, 300);
-  }, [listId]);
+    }
+    setLoading(false);
+  }, [listId, getListById]);
 
   const handleSwipeComplete = (results: { itemId: string; vote: "like" | "dislike" }[]) => {
     console.log("Swipe results:", results);
@@ -145,5 +115,23 @@ export default function VotePage() {
       onComplete={handleSwipeComplete}
       onBack={handleBack}
     />
+  );
+}
+
+export default function VotePage() {
+  return (
+    <Suspense fallback={
+      <>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link href="https://fonts.googleapis.com/css2?family=Galindo&display=swap" rel="stylesheet" />
+        
+        <div className="min-h-screen bg-gradient-to-b from-[#5e00c9] to-[#7a1aff] flex items-center justify-center font-['Galindo']">
+          <p className="text-white text-lg">Yükleniyor...</p>
+        </div>
+      </>
+    }>
+      <VotePageContent />
+    </Suspense>
   );
 }

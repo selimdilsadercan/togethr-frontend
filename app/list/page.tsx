@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, MoreVertical, Users, Tag, Gamepad2, Star, Sparkles, CheckCircle2 } from "lucide-react";
 import {
@@ -14,193 +14,31 @@ import {
   DrawerTrigger,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
+import { useLists, useFriends, type List } from "@/lib/storage";
 
-interface ListItem {
-  id: string;
-  title: string;
-  playerCount?: string;
-  gameType?: string;
-  image?: string;
-}
-
-interface ListDetail {
-  id: string;
-  title: string;
-  description?: string;
-  category: string;
-  totalCount: number;
-  createdBy: string;
-  options: ListItem[];
-}
-
-// Mock data
-const mockLists: Record<string, ListDetail> = {
-  "1": {
-    id: "1",
-    title: "Tek Bilgisayarda Oynanan Oyunlar",
-    description: "En iyi lokal multiplayer oyunlar",
-    category: "game",
-    totalCount: 12,
-    createdBy: "@must",
-    options: [
-      {
-        id: "1",
-        title: "Bopl Battle",
-        playerCount: "2-4 kişi",
-        gameType: "Arena / Party Game"
-      },
-      {
-        id: "2",
-        title: "Stick Fight: The Game",
-        playerCount: "2-4 kişi",
-        gameType: "Arena / Party Game"
-      },
-      {
-        id: "3",
-        title: "Ultimate Chicken Horse",
-        playerCount: "2-4 kişi",
-        gameType: "Arena / Party Game"
-      },
-      {
-        id: "4",
-        title: "Tricky Towers",
-        playerCount: "2-4 kişi",
-        gameType: "Arena / Party Game"
-      }
-    ]
-  },
-  "2": {
-    id: "2",
-    title: "Evde oynanacak oyunlar",
-    description: "Evde arkadaşlarla oynanacak en iyi oyunlar",
-    category: "game",
-    totalCount: 12,
-    createdBy: "@user",
-    options: [
-      {
-        id: "1",
-        title: "Among Us",
-        playerCount: "4-10 kişi",
-        gameType: "Social Deduction"
-      },
-      {
-        id: "2",
-        title: "Gang Beasts",
-        playerCount: "2-4 kişi",
-        gameType: "Party Game"
-      },
-      {
-        id: "3",
-        title: "Overcooked 2",
-        playerCount: "1-4 kişi",
-        gameType: "Co-op"
-      },
-      {
-        id: "4",
-        title: "Mario Kart 8",
-        playerCount: "1-4 kişi",
-        gameType: "Racing"
-      }
-    ]
-  },
-  "3": {
-    id: "3",
-    title: "Hafta sonu aktivite fikirleri",
-    description: "Hafta sonları yapılabilecek aktiviteler",
-    category: "activity",
-    totalCount: 16,
-    createdBy: "@admin",
-    options: [
-      {
-        id: "1",
-        title: "Piknik yapmak",
-        playerCount: "2+ kişi",
-        gameType: "Outdoor"
-      },
-      {
-        id: "2",
-        title: "Sinema",
-        playerCount: "1+ kişi",
-        gameType: "Entertainment"
-      },
-      {
-        id: "3",
-        title: "Kafe gezme",
-        playerCount: "2+ kişi",
-        gameType: "Social"
-      },
-      {
-        id: "4",
-        title: "Müze ziyareti",
-        playerCount: "1+ kişi",
-        gameType: "Culture"
-      }
-    ]
-  },
-  "4": {
-    id: "4",
-    title: "Korku filmi önerileri",
-    description: "En iyi korku filmleri",
-    category: "movie",
-    totalCount: 15,
-    createdBy: "@cinema",
-    options: [
-      {
-        id: "1",
-        title: "The Conjuring",
-        playerCount: "N/A",
-        gameType: "Horror / Supernatural"
-      },
-      {
-        id: "2",
-        title: "Hereditary",
-        playerCount: "N/A",
-        gameType: "Horror / Drama"
-      },
-      {
-        id: "3",
-        title: "A Quiet Place",
-        playerCount: "N/A",
-        gameType: "Horror / Thriller"
-      },
-      {
-        id: "4",
-        title: "Get Out",
-        playerCount: "N/A",
-        gameType: "Horror / Thriller"
-      }
-    ]
-  }
-};
-
-// Mock friends data
-const mockFriends = [
-  { id: "1", name: "Ahmet Yılmaz", username: "@ahmet", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ahmet" },
-  { id: "2", name: "Ayşe Demir", username: "@ayse", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ayse" },
-  { id: "3", name: "Mehmet Kaya", username: "@mehmet", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Mehmet" },
-  { id: "4", name: "Zeynep Şahin", username: "@zeynep", avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Zeynep" },
-];
-
-export default function ListDetailPage() {
+function ListDetailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const listId = searchParams.get("listId");
   
-  const [listData, setListData] = useState<ListDetail | null>(null);
+  // Use localStorage hooks
+  const { getListById } = useLists();
+  const { friends } = useFriends();
+  
+  const [listData, setListData] = useState<List | null>(null);
   const [loading, setLoading] = useState(true);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedFriends, setSelectedFriends] = useState<string[]>([]);
   const [voteType, setVoteType] = useState<"vote" | "bracket">("vote");
 
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      if (listId && mockLists[listId]) {
-        setListData(mockLists[listId]);
-      }
-      setLoading(false);
-    }, 300);
-  }, [listId]);
+    // Get list from localStorage
+    if (listId) {
+      const list = getListById(listId);
+      setListData(list);
+    }
+    setLoading(false);
+  }, [listId, getListById]);
 
   const toggleFriend = (friendId: string) => {
     setSelectedFriends(prev => 
@@ -391,7 +229,7 @@ export default function ListDetailPage() {
                   <div className="space-y-3">
                     <h3 className="text-sm font-normal text-gray-700">Katılımcılar</h3>
                     <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {mockFriends.map((friend) => (
+                      {friends.map((friend) => (
                         <button
                           key={friend.id}
                           onClick={() => toggleFriend(friend.id)}
@@ -457,4 +295,22 @@ function getCategoryLabel(category: string): string {
     movie: "Film",
   };
   return categories[category] || category;
+}
+
+export default function ListDetailPage() {
+  return (
+    <Suspense fallback={
+      <>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
+        <link href="https://fonts.googleapis.com/css2?family=Galindo&display=swap" rel="stylesheet" />
+        
+        <div className="min-h-screen bg-white flex items-center justify-center font-['Galindo']">
+          <p className="text-gray-500">Yükleniyor...</p>
+        </div>
+      </>
+    }>
+      <ListDetailContent />
+    </Suspense>
+  );
 }
